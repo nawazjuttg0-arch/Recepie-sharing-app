@@ -303,8 +303,8 @@
 
 {% block extra_js %}
 <script>
-// Get recipe ID from URL
-const recipeId = {{ recipe_id }};
+// Get recipe ID from URL path
+const recipeId = parseInt(window.location.pathname.split('/')[2]);
 </script>
 <script src="{{ url_for('static', filename='js/edit-recipe.js') }}"></script>
 {% endblock %}
