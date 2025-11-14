@@ -5,31 +5,12 @@ Seed script to populate the database with sample recipes and images
 
 import os
 import json
-import requests
 from datetime import datetime
 from app import app
 from extensions import db
 from models.user import User
 from models.recipe import Recipe
 from models.review import Review
-
-def download_image(url, filename):
-    """Download image from URL and save to static/uploads/recipes/"""
-    try:
-        upload_dir = os.path.join('static', 'uploads', 'recipes')
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        
-        file_path = os.path.join(upload_dir, filename)
-        with open(file_path, 'wb') as f:
-            f.write(response.content)
-        
-        return f"uploads/recipes/{filename}"
-    except Exception as e:
-        print(f"Error downloading image {filename}: {e}")
-        return None
 
 def clear_database():
     """Clear all existing data"""
@@ -67,6 +48,15 @@ def create_sample_users():
             'last_name': 'User',
             'bio': 'TastyShare Administrator',
             'role': 'admin'
+        },
+        {
+            'username': 'user',
+            'email': 'user@tastyshare.com',
+            'password': 'user123',
+            'first_name': 'Demo',
+            'last_name': 'User',
+            'bio': 'Demo user account for testing',
+            'role': 'user'
         }
     ]
     
@@ -126,7 +116,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'medium',
             'calories_per_serving': 520,
             'tags': '["pasta", "italian", "carbonara", "quick"]',
-            'image_url': 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Spicy Indian Butter Chicken',
@@ -166,7 +156,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'medium',
             'calories_per_serving': 380,
             'tags': '["indian", "curry", "spicy", "chicken"]',
-            'image_url': 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Fresh Mediterranean Greek Salad',
@@ -203,7 +193,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'easy',
             'calories_per_serving': 220,
             'tags': '["greek", "salad", "healthy", "vegetarian"]',
-            'image_url': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Classic American Cheeseburger',
@@ -243,7 +233,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'easy',
             'calories_per_serving': 650,
             'tags': '["american", "burger", "beef", "quick"]',
-            'image_url': 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Chocolate Chip Cookies',
@@ -280,7 +270,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'easy',
             'calories_per_serving': 180,
             'tags': '["dessert", "cookies", "chocolate", "baking"]',
-            'image_url': 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Healthy Avocado Toast',
@@ -318,7 +308,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'easy',
             'calories_per_serving': 280,
             'tags': '["breakfast", "healthy", "avocado", "eggs"]',
-            'image_url': 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Thai Green Curry',
@@ -358,7 +348,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'medium',
             'calories_per_serving': 420,
             'tags': '["thai", "curry", "spicy", "coconut"]',
-            'image_url': 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'French Croissant',
@@ -394,7 +384,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'hard',
             'calories_per_serving': 280,
             'tags': '["french", "pastry", "breakfast", "baking"]',
-            'image_url': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Japanese Sushi Bowl',
@@ -434,7 +424,7 @@ def create_sample_recipes(users):
             'difficulty_level': 'medium',
             'calories_per_serving': 480,
             'tags': '["japanese", "sushi", "fish", "rice"]',
-            'image_url': 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         },
         {
             'title': 'Mexican Street Tacos',
@@ -474,19 +464,15 @@ def create_sample_recipes(users):
             'difficulty_level': 'easy',
             'calories_per_serving': 320,
             'tags': '["mexican", "tacos", "street food", "quick"]',
-            'image_url': 'https://images.unsplash.com/photo-1565299585323-38174c13246b?w=500&h=500&fit=crop'
+            'image_url': 'uploads/recipes/default_recipe.jpg'
         }
     ]
     
-    print("Creating sample recipes with images...")
+    print("Creating sample recipes...")
     
     for i, recipe_data in enumerate(recipes_data):
         # Assign recipes to users (round robin)
         user = users[i % len(users)]
-        
-        # Download image
-        image_filename = f"recipe_{i+1}.jpg"
-        image_path = download_image(recipe_data['image_url'], image_filename)
         
         recipe = Recipe(
             title=recipe_data['title'],
@@ -502,7 +488,7 @@ def create_sample_recipes(users):
             servings=recipe_data['servings'],
             difficulty_level=recipe_data['difficulty_level'],
             calories_per_serving=recipe_data['calories_per_serving'],
-            image_url=image_path if image_path else None,
+            image_url=recipe_data['image_url'],
             tags=recipe_data['tags'],
             is_featured=i < 3,  # Make first 3 recipes featured
             user_id=user.id,
@@ -512,7 +498,7 @@ def create_sample_recipes(users):
         db.session.add(recipe)
     
     db.session.commit()
-    print(f"Created {len(recipes_data)} sample recipes with images")
+    print(f"Created {len(recipes_data)} sample recipes")
 
 def create_sample_reviews():
     """Create some sample reviews for recipes"""
