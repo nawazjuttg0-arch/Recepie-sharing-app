@@ -79,6 +79,10 @@ def create_app():
     def recipe_detail(recipe_id):
         return render_template('recipe_detail.html', recipe_id=recipe_id)
 
+    @app.route('/recipe/<int:recipe_id>/edit')
+    def edit_recipe_page(recipe_id):
+        return render_template('edit_recipe.html', recipe_id=recipe_id)
+
     @app.route('/add-recipe')
     def add_recipe_page():
         return render_template('add_recipe.html')

@@ -518,16 +518,23 @@ def create_sample_reviews():
     
     import random
     
+    # Track user-recipe combinations to avoid duplicates
+    user_recipe_combinations = set()
+    
     for recipe in recipes[:8]:  # Add reviews to first 8 recipes
-        for _ in range(random.randint(2, 5)):  # 2-5 reviews per recipe
-            user = random.choice(users)
-            review = Review(
-                rating=random.randint(4, 5),  # Good ratings
-                comment=random.choice(reviews_data),
-                user_id=user.id,
-                recipe_id=recipe.id
-            )
-            db.session.add(review)
+        num_reviews = random.randint(2, min(4, len(users)))  # Ensure we don't exceed available users
+        recipe_users = random.sample(users, num_reviews)  # Get unique users for this recipe
+        
+        for user in recipe_users:
+            if (user.id, recipe.id) not in user_recipe_combinations:
+                review = Review(
+                    rating=random.randint(4, 5),  # Good ratings
+                    comment=random.choice(reviews_data),
+                    user_id=user.id,
+                    recipe_id=recipe.id
+                )
+                db.session.add(review)
+                user_recipe_combinations.add((user.id, recipe.id))
     
     db.session.commit()
     print("Created sample reviews")

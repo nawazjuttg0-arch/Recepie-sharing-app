@@ -273,13 +273,28 @@ class RecipeDetailManager {
 
     updateUserActions() {
         const actionsElement = document.getElementById('recipe-actions');
-        if (actionsElement && this.recipe.is_owner) {
+        if (!actionsElement) return;
+
+        // Check if current user is the recipe author or admin
+        const currentUserId = window.auth ? window.auth.getCurrentUser()?.id : null;
+        const isOwner = currentUserId && (
+            currentUserId === this.recipe.user_id || 
+            currentUserId === this.recipe.author?.id
+        );
+        
+        // Check if user is admin
+        const currentUser = window.auth ? window.auth.getCurrentUser() : null;
+        const isAdmin = currentUser && currentUser.role === 'admin';
+
+        if (isOwner || isAdmin) {
             actionsElement.style.display = 'block';
             
             const editBtn = document.getElementById('edit-recipe-btn');
             if (editBtn) {
-                editBtn.href = `/edit-recipe/${this.recipeId}`;
+                editBtn.href = `/recipe/${this.recipeId}/edit`;
             }
+        } else {
+            actionsElement.style.display = 'none';
         }
     }
 
