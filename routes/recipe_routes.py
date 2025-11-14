@@ -266,9 +266,19 @@ def update_recipe(recipe_id):
         if 'description' in data:
             recipe.description = data['description'].strip()
         if 'ingredients' in data:
-            recipe.ingredients = data['ingredients'].strip()
+            # Parse ingredients JSON string
+            try:
+                ingredients = json.loads(data['ingredients']) if data['ingredients'] else []
+                recipe.ingredients = json.dumps(ingredients)
+            except (json.JSONDecodeError, TypeError):
+                recipe.ingredients = data['ingredients'].strip()
         if 'instructions' in data:
-            recipe.instructions = data['instructions'].strip()
+            # Parse instructions JSON string
+            try:
+                instructions = json.loads(data['instructions']) if data['instructions'] else []
+                recipe.instructions = json.dumps(instructions)
+            except (json.JSONDecodeError, TypeError):
+                recipe.instructions = data['instructions'].strip()
         if 'category' in data:
             recipe.category = data['category'].strip()
         if 'cuisine_type' in data:
