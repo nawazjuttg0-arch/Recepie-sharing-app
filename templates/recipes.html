@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Recipes - TastyShare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-center mb-4">
+                <i class="fas fa-book me-2"></i>Discover Amazing Recipes
+            </h1>
+            <p class="lead text-center text-muted">
+                Explore thousands of delicious recipes from our community of food lovers
+            </p>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div id="search-filter-container">
+        <!-- Will be populated by JavaScript -->
+    </div>
+
+    <!-- Results Summary -->
+    <div class="row mb-3">
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div id="results-summary" class="text-muted">
+                Loading recipes...
+            </div>
+        </div>
+        <div class="col-12 col-md-6 text-center text-md-end">
+            <div class="btn-group" role="group" aria-label="View options">
+                <button type="button" class="btn btn-outline-secondary btn-sm active touch-target" id="grid-view-btn">
+                    <i class="fas fa-th"></i> <span class="d-none d-sm-inline">Grid</span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm touch-target" id="list-view-btn">
+                    <i class="fas fa-list"></i> <span class="d-none d-sm-inline">List</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-container" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading recipes...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading delicious recipes...</p>
+    </div>
+
+    <!-- Recipes Grid -->
+    <div id="recipes-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" style="display: none;">
+        <!-- Will be populated by JavaScript -->
+    </div>
+
+    <!-- No Results Message -->
+    <div id="no-results" class="text-center py-5" style="display: none;">
+        <div class="mb-4">
+            <i class="fas fa-search fa-3x text-muted"></i>
+        </div>
+        <h4 class="text-muted">No recipes found</h4>
+        <p class="text-muted">Try adjusting your search criteria or browse all recipes.</p>
+        <button class="btn btn-primary" id="clear-filters-btn">
+            <i class="fas fa-refresh me-2"></i>Clear Filters
+        </button>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination-container" class="mt-4">
+        <!-- Will be populated by JavaScript -->
+    </div>
+</div>
+
+<!-- Add Recipe Floating Button (for authenticated users) -->
+<div id="add-recipe-fab" style="display: none;">
+    <a href="{{ url_for('add_recipe_page') }}" class="btn btn-primary btn-floating">
+        <i class="fas fa-plus"></i>
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/recipes.js') }}"></script>
+{% endblock %}

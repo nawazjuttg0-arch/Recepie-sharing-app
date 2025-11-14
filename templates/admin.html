@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Admin Panel - TastyShare</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    <style>
+        /* Enhanced Admin Panel Styles */
+        .admin-sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .admin-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .admin-header {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .admin-main {
+            padding: 2rem;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .stats-card .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-card h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        .btn-admin {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-admin:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .admin-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .welcome-text {
+            color: #6c757d;
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        .sidebar-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                min-height: auto;
+                padding-bottom: 1rem;
+            }
+            
+            .admin-header {
+                padding: 1rem;
+            }
+            
+            .admin-main {
+                padding: 1rem;
+            }
+            
+            .admin-title {
+                font-size: 1.5rem;
+            }
+            
+            .stats-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .stats-card h3 {
+                font-size: 1.8rem;
+            }
+            
+            .stats-card .card-title {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .admin-title {
+                font-size: 1.3rem;
+            }
+            
+            .welcome-text {
+                font-size: 0.9rem;
+            }
+            
+            .stats-card h3 {
+                font-size: 1.6rem;
+            }
+            
+            .btn-admin {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Card Hover Effects */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-12 col-md-3 col-lg-2 px-0 admin-sidebar">
+                <div class="p-3">
+                    <div class="sidebar-brand">
+                        <i class="fas fa-crown me-2"></i>Admin Panel
+                    </div>
+                    <nav class="nav flex-column">
+                        <a href="#dashboard" class="sidebar-link active" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a href="#recipes" class="sidebar-link" data-section="recipes">
+                            <i class="fas fa-utensils me-2"></i>Manage Recipes
+                        </a>
+                        <a href="#users" class="sidebar-link" data-section="users">
+                            <i class="fas fa-users me-2"></i>Manage Users
+                        </a>
+                        <a href="/" class="sidebar-link">
+                            <i class="fas fa-home me-2"></i>Back to Site
+                        </a>
+                        <a href="#" class="sidebar-link" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-12 col-md-9 col-lg-10 admin-content">
+                <!-- Header -->
+                <div class="admin-header">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                        <div>
+                            <h1 class="admin-title">Admin Dashboard</h1>
+                            <p class="welcome-text mb-0">Welcome back, <span id="admin-username">Admin</span></p>
+                        </div>
+                        <div class="mt-2 mt-md-0">
+                            <button class="btn btn-primary btn-admin" onclick="refreshData()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="admin-main">
+                    <!-- Dashboard Content -->
+                    <div id="dashboard-section" class="content-section">
+                        <div class="row g-4">
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <div class="stats-card card-hover">
+                                    <div class="text-center">
+                                        <h5 class="card-title text-primary">Total Users</h5>
+                                        <h3 id="total-users" class="text-primary">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <div class="stats-card card-hover">
+                                    <div class="text-center">
+                                        <h5 class="card-title text-success">Total Recipes</h5>
+                                        <h3 id="total-recipes" class="text-success">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <div class="stats-card card-hover">
+                                    <div class="text-center">
+                                        <h5 class="card-title text-warning">Total Reviews</h5>
+                                        <h3 id="total-reviews" class="text-warning">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <div class="stats-card card-hover">
+                                    <div class="text-center">
+                                        <h5 class="card-title text-info">Active Users</h5>
+                                        <h3 id="active-users" class="text-info">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Stats Row -->
+                        <div class="row g-4 mt-2">
+                            <div class="col-12 col-md-6">
+                                <div class="stats-card card-hover">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-chart-line fa-2x text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5 class="card-title text-muted">System Status</h5>
+                                            <h4 class="text-success mb-0">Online</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="stats-card card-hover">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-database fa-2x text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5 class="card-title text-muted">Database</h5>
+                                            <h4 class="text-success mb-0">Connected</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recipes Management Section -->
+                    <div id="recipes-section" class="content-section" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="admin-title">Manage Recipes</h2>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-admin" onclick="refreshRecipes()">
+                                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-4">
+                                <input type="text" id="recipe-search" class="form-control" placeholder="Search recipes..." onkeyup="filterRecipes()">
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <select id="recipe-status-filter" class="form-select" onchange="filterRecipes()">
+                                    <option value="all">All Status</option>
+                                    <option value="published">Published</option>
+                                    <option value="draft">Draft</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <select id="recipe-category-filter" class="form-select" onchange="filterRecipes()">
+                                    <option value="">All Categories</option>
+                                    <option value="Breakfast">Breakfast</option>
+                                    <option value="Lunch">Lunch</option>
+                                    <option value="Dinner">Dinner</option>
+                                    <option value="Dessert">Dessert</option>
+                                    <option value="Snack">Snack</option>
+                                    <option value="Beverage">Beverage</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Recipes Table -->
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Recipe</th>
+                                                <th>Author</th>
+                                                <th>Category</th>
+                                                <th>Status</th>
+                                                <th>Featured</th>
+                                                <th>Views</th>
+                                                <th>Created</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recipes-table-body">
+                                            <tr>
+                                                <td colspan="8" class="text-center py-4">
+                                                    <div class="loading-spinner"></div>
+                                                    <span class="ms-2">Loading recipes...</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Recipes pagination" class="mt-3">
+                            <ul id="recipes-pagination" class="pagination justify-content-center">
+                                <!-- Pagination will be inserted here -->
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- Users Management Section -->
+                    <div id="users-section" class="content-section" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="admin-title">Manage Users</h2>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-admin" onclick="refreshUsers()">
+                                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- User Filters -->
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-4">
+                                <input type="text" id="user-search" class="form-control" placeholder="Search users..." onkeyup="filterUsers()">
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <select id="user-status-filter" class="form-select" onchange="filterUsers()">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <select id="user-role-filter" class="form-select" onchange="filterUsers()">
+                                    <option value="all">All Roles</option>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Users Table -->
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>User</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Status</th>
+                                                <th>Recipes</th>
+                                                <th>Joined</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="users-table-body">
+                                            <tr>
+                                                <td colspan="7" class="text-center py-4">
+                                                    <div class="loading-spinner"></div>
+                                                    <span class="ms-2">Loading users...</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Users pagination" class="mt-3">
+                            <ul id="users-pagination" class="pagination justify-content-center">
+                                <!-- Pagination will be inserted here -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong class="me-auto" id="toast-title">TastyShare</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-body">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let currentUser = null;
+
+        // Toast notification function
+        function showToast(message, type = 'info', title = 'TastyShare') {
+            const toastEl = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastBody = document.getElementById('toast-body');
+            
+            if (!toastEl) return;
+
+            // Set toast content
+            toastTitle.textContent = title;
+            toastBody.textContent = message;
+
+            // Set toast type styling
+            toastEl.className = 'toast';
+            const toastHeader = toastEl.querySelector('.toast-header');
+            toastHeader.className = 'toast-header';
+            
+            switch (type) {
+                case 'success':
+                    toastHeader.classList.add('bg-success', 'text-white');
+                    break;
+                case 'error':
+                    toastHeader.classList.add('bg-danger', 'text-white');
+                    break;
+                case 'warning':
+                    toastHeader.classList.add('bg-warning', 'text-dark');
+                    break;
+                default:
+                    toastHeader.classList.add('bg-info', 'text-white');
+            }
+
+            // Show toast
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[NEW ADMIN] DOM loaded, starting initialization...');
+            checkAuth();
+        });
+
+        // Check authentication
+        async function checkAuth() {
+            console.log('[NEW ADMIN] Starting authentication check...');
+            
+            const token = localStorage.getItem('tastyshare_token');
+            const userData = localStorage.getItem('tastyshare_user');
+            
+            console.log('[NEW ADMIN] Token found:', !!token);
+            console.log('[NEW ADMIN] Token preview:', token ? token.substring(0, 50) + '...' : 'NO TOKEN');
+            console.log('[NEW ADMIN] User data found:', !!userData);
+            
+            if (!token) {
+                console.log('[NEW ADMIN] No token found, redirecting to login');
+                showToast('Please login to access admin panel', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+                return;
+            }
+
+            // Try to use cached user data first
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    console.log('[NEW ADMIN] Using cached user data:', user);
+                    
+                    if (user.role === 'admin') {
+                        currentUser = user;
+                        console.log('[NEW ADMIN] Cached admin user found:', user.username);
+                        updateUI();
+                        loadDashboardData();
+                        return;
+                    } else {
+                        console.log('[NEW ADMIN] Cached user is not admin, role:', user.role);
+                        window.location.href = '/';
+                        return;
+                    }
+                } catch (e) {
+                    console.log('[NEW ADMIN] Failed to parse cached user data:', e);
+                }
+            }
+
+            // If no cached data, fetch from API
+            try {
+                console.log('[NEW ADMIN] Fetching fresh user data from API...');
+                const response = await fetch('/api/auth/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('[NEW ADMIN] API response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[NEW ADMIN] API request failed:', response.status, errorText);
+                    
+                    if (response.status === 401) {
+                        showToast('Session expired. Please login again.', 'error');
+                        localStorage.removeItem('tastyshare_token');
+                        localStorage.removeItem('tastyshare_user');
+                    } else if (response.status === 422) {
+                        showToast('Invalid token. Please login again.', 'error');
+                        localStorage.removeItem('tastyshare_token');
+                        localStorage.removeItem('tastyshare_user');
+                    } else {
+                        showToast('Authentication failed. Please try again.', 'error');
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('[NEW ADMIN] API response data:', data);
+                
+                currentUser = data.user;
+
+                if (!currentUser || currentUser.role !== 'admin') {
+                    console.log('[NEW ADMIN] User is not admin, role:', currentUser?.role);
+                    window.location.href = '/';
+                    return;
+                }
+
+                // Update localStorage with fresh data
+                localStorage.setItem('tastyshare_user', JSON.stringify(currentUser));
+                console.log('[NEW ADMIN] Authentication successful, user:', currentUser.username);
+                updateUI();
+                loadDashboardData();
+
+            } catch (error) {
+                console.error('[NEW ADMIN] Auth check failed:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        function updateUI() {
+            const usernameElement = document.getElementById('admin-username');
+            if (usernameElement && currentUser) {
+                usernameElement.textContent = currentUser.username;
+            }
+        }
+
+        async function loadDashboardData() {
+            console.log('[NEW ADMIN] Loading dashboard data...');
+            
+            // Show loading state
+            showLoadingState();
+            
+            const token = localStorage.getItem('tastyshare_token');
+            
+            try {
+                const response = await fetch('/api/admin/dashboard', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('[NEW ADMIN] Dashboard API response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[NEW ADMIN] Dashboard API failed:', response.status, errorText);
+                    throw new Error(`Dashboard API failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('[NEW ADMIN] Dashboard data received:', data);
+                
+                // Update UI with data
+                updateDashboardStats(data);
+                
+            } catch (error) {
+                console.error('[NEW ADMIN] Error loading dashboard data:', error);
+                showErrorState();
+            }
+        }
+
+        function showLoadingState() {
+            const elements = ['total-users', 'total-recipes', 'total-reviews', 'active-users'];
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<span class="loading-spinner"></span>';
+                }
+            });
+        }
+
+        function updateDashboardStats(data) {
+            // Animate the numbers
+            animateNumber('total-users', data.users?.total || 0);
+            animateNumber('total-recipes', data.recipes?.total || 0);
+            animateNumber('total-reviews', data.reviews?.total || 0);
+            animateNumber('active-users', data.users?.active || 0);
+        }
+
+        function animateNumber(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const startValue = 0;
+            const duration = 1000; // 1 second
+            const startTime = performance.now();
+
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function for smooth animation
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
+                
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+
+            requestAnimationFrame(updateNumber);
+        }
+
+        function showErrorState() {
+            const elements = ['total-users', 'total-recipes', 'total-reviews', 'active-users'];
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i>';
+                }
+            });
+        }
+
+        function refreshData() {
+            loadDashboardData();
+        }
+
+        // Navigation between sections
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Remove active class from all sidebar links
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+            
+            // Add active class to clicked link
+            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+            
+            // Load data for the section
+            if (sectionName === 'recipes') {
+                loadRecipes();
+            } else if (sectionName === 'users') {
+                loadUsers();
+            }
+        }
+
+        // Add click handlers to sidebar links
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to sidebar links
+            document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+        });
+
+        // Recipes Management
+        let currentRecipesPage = 1;
+        let currentRecipesFilters = {
+            search: '',
+            status: 'all',
+            category: ''
+        };
+
+        async function loadRecipes(page = 1) {
+            console.log('[ADMIN] Loading recipes, page:', page);
+            
+            const token = localStorage.getItem('tastyshare_token');
+            const params = new URLSearchParams({
+                page: page,
+                per_page: 10,
+                search: currentRecipesFilters.search,
+                status: currentRecipesFilters.status,
+                category: currentRecipesFilters.category
+            });
+
+            try {
+                const response = await fetch(`/api/admin/recipes?${params}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load recipes: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('[ADMIN] Recipes data received:', data);
+                
+                displayRecipes(data.recipes);
+                createPagination('recipes-pagination', data.pagination, loadRecipes);
+                currentRecipesPage = page;
+
+            } catch (error) {
+                console.error('[ADMIN] Error loading recipes:', error);
+                showToast('Failed to load recipes', 'error');
+            }
+        }
+
+        function displayRecipes(recipes) {
+            const tbody = document.getElementById('recipes-table-body');
+            
+            if (!recipes || recipes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-utensils fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No recipes found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = recipes.map(recipe => `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="${recipe.image_url || '/static/images/recipe-placeholder.jpg'}" 
+                                 alt="${recipe.title}" 
+                                 class="rounded me-3" 
+                                 style="width: 50px; height: 50px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0">${recipe.title}</h6>
+                                <small class="text-muted">${recipe.description ? recipe.description.substring(0, 50) + '...' : 'No description'}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${recipe.author_username}</td>
+                    <td><span class="badge bg-secondary">${recipe.category}</span></td>
+                    <td>
+                        <span class="badge ${recipe.is_published ? 'bg-success' : 'bg-warning'}">
+                            ${recipe.is_published ? 'Published' : 'Draft'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${recipe.is_featured ? 'bg-primary' : 'bg-light text-dark'}">
+                            ${recipe.is_featured ? 'Featured' : 'Regular'}
+                        </span>
+                    </td>
+                    <td>${recipe.view_count || 0}</td>
+                    <td>${new Date(recipe.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" onclick="toggleRecipePublish(${recipe.id})" title="Toggle Publish">
+                                <i class="fas ${recipe.is_published ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="toggleRecipeFeatured(${recipe.id})" title="Toggle Featured">
+                                <i class="fas ${recipe.is_featured ? 'fa-star' : 'fa-star-o'}"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteRecipe(${recipe.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterRecipes() {
+            currentRecipesFilters = {
+                search: document.getElementById('recipe-search').value,
+                status: document.getElementById('recipe-status-filter').value,
+                category: document.getElementById('recipe-category-filter').value
+            };
+            loadRecipes(1);
+        }
+
+        async function toggleRecipePublish(recipeId) {
+            const token = localStorage.getItem('tastyshare_token');
+            
+            try {
+                const response = await fetch(`/api/admin/recipes/${recipeId}/toggle-publish`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to toggle publish: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showToast(data.message, 'success');
+                loadRecipes(currentRecipesPage);
+
+            } catch (error) {
+                console.error('[ADMIN] Error toggling publish:', error);
+                showToast('Failed to update recipe status', 'error');
+            }
+        }
+
+        async function toggleRecipeFeatured(recipeId) {
+            const token = localStorage.getItem('tastyshare_token');
+            
+            try {
+                const response = await fetch(`/api/admin/recipes/${recipeId}/toggle-featured`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to toggle featured: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showToast(data.message, 'success');
+                loadRecipes(currentRecipesPage);
+
+            } catch (error) {
+                console.error('[ADMIN] Error toggling featured:', error);
+                showToast('Failed to update recipe status', 'error');
+            }
+        }
+
+        async function deleteRecipe(recipeId) {
+            if (!confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+                return;
+            }
+
+            const token = localStorage.getItem('tastyshare_token');
+            
+            try {
+                const response = await fetch(`/api/admin/recipes/${recipeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to delete recipe: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showToast(data.message, 'success');
+                loadRecipes(currentRecipesPage);
+
+            } catch (error) {
+                console.error('[ADMIN] Error deleting recipe:', error);
+                showToast('Failed to delete recipe', 'error');
+            }
+        }
+
+        function refreshRecipes() {
+            loadRecipes(currentRecipesPage);
+        }
+
+        // Users Management
+        let currentUsersPage = 1;
+        let currentUsersFilters = {
+            search: '',
+            status: 'all',
+            role: 'all'
+        };
+
+        async function loadUsers(page = 1) {
+            console.log('[ADMIN] Loading users, page:', page);
+            
+            const token = localStorage.getItem('tastyshare_token');
+            const params = new URLSearchParams({
+                page: page,
+                per_page: 10,
+                search: currentUsersFilters.search,
+                status: currentUsersFilters.status,
+                role: currentUsersFilters.role
+            });
+
+            try {
+                const response = await fetch(`/api/admin/users?${params}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load users: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('[ADMIN] Users data received:', data);
+                
+                displayUsers(data.users);
+                createPagination('users-pagination', data.pagination, loadUsers);
+                currentUsersPage = page;
+
+            } catch (error) {
+                console.error('[ADMIN] Error loading users:', error);
+                showToast('Failed to load users', 'error');
+            }
+        }
+
+        function displayUsers(users) {
+            const tbody = document.getElementById('users-table-body');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-users fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No users found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="${user.avatar_url || '/static/images/avatar-placeholder.png'}" 
+                                 alt="${user.username}" 
+                                 class="rounded-circle me-3" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0">${user.username}</h6>
+                                <small class="text-muted">${user.first_name} ${user.last_name}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">
+                            ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${user.is_active ? 'bg-success' : 'bg-secondary'}">
+                            ${user.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>${user.recipe_count || 0}</td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-warning" onclick="toggleUserStatus(${user.id})" title="Toggle Status">
+                                <i class="fas ${user.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="changeUserRole(${user.id}, '${user.role}')" title="Change Role">
+                                <i class="fas fa-user-cog"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterUsers() {
+            currentUsersFilters = {
+                search: document.getElementById('user-search').value,
+                status: document.getElementById('user-status-filter').value,
+                role: document.getElementById('user-role-filter').value
+            };
+            loadUsers(1);
+        }
+
+        async function toggleUserStatus(userId) {
+            const token = localStorage.getItem('tastyshare_token');
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to toggle user status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showToast(data.message, 'success');
+                loadUsers(currentUsersPage);
+
+            } catch (error) {
+                console.error('[ADMIN] Error toggling user status:', error);
+                showToast('Failed to update user status', 'error');
+            }
+        }
+
+        async function changeUserRole(userId, currentRole) {
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            
+            if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('tastyshare_token');
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to change user role: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showToast(data.message, 'success');
+                loadUsers(currentUsersPage);
+
+            } catch (error) {
+                console.error('[ADMIN] Error changing user role:', error);
+                showToast('Failed to change user role', 'error');
+            }
+        }
+
+        function refreshUsers() {
+            loadUsers(currentUsersPage);
+        }
+
+        // Pagination function
+        function createPagination(containerId, pagination, loadFunction) {
+            const container = document.getElementById(containerId);
+            if (!container || !pagination) return;
+
+            const { page, pages, has_prev, has_next } = pagination;
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            if (has_prev) {
+                paginationHTML += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="loadFunction(${page - 1}); return false;">Previous</a>
+                    </li>
+                `;
+            } else {
+                paginationHTML += `
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                `;
+            }
+            
+            // Page numbers
+            const startPage = Math.max(1, page - 2);
+            const endPage = Math.min(pages, page + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === page) {
+                    paginationHTML += `
+                        <li class="page-item active">
+                            <span class="page-link">${i}</span>
+                        </li>
+                    `;
+                } else {
+                    paginationHTML += `
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="loadFunction(${i}); return false;">${i}</a>
+                        </li>
+                    `;
+                }
+            }
+            
+            // Next button
+            if (has_next) {
+                paginationHTML += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="loadFunction(${page + 1}); return false;">Next</a>
+                    </li>
+                `;
+            } else {
+                paginationHTML += `
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                `;
+            }
+            
+            container.innerHTML = paginationHTML;
+        }
+
+        function logout() {
+            localStorage.removeItem('tastyshare_token');
+            localStorage.removeItem('tastyshare_user');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

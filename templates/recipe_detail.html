@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Recipe - TastyShare{% endblock %}
+
+{% block content %}
+<div class="container py-4" id="recipe-container">
+    <!-- Loading State -->
+    <div id="loading-container" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading recipe...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading delicious recipe...</p>
+    </div>
+
+    <!-- Recipe Content (Hidden initially) -->
+    <div id="recipe-content" style="display: none;">
+        <!-- Recipe Header -->
+        <div class="row mb-4">
+            <div class="col-12 col-lg-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('recipes_page') }}">Recipes</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-title">Recipe</li>
+                    </ol>
+                </nav>
+                
+                <h1 class="display-5 fw-bold mb-3" id="recipe-title"></h1>
+                <p class="lead text-muted mb-3" id="recipe-description"></p>
+                
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <div class="rating" id="recipe-rating"></div>
+                    <span class="text-muted" id="recipe-views"></span>
+                    <span class="text-muted" id="recipe-date"></span>
+                </div>
+                
+                <div class="d-flex flex-wrap gap-2" id="recipe-badges"></div>
+            </div>
+            
+            <div class="col-12 col-lg-4 text-center text-lg-end mt-3 mt-lg-0">
+                <div class="d-flex flex-column flex-sm-row flex-lg-column gap-2 justify-content-center justify-content-lg-end">
+                    <button class="btn btn-outline-danger touch-target" id="favorite-btn" style="display: none;">
+                        <i class="fas fa-heart"></i> <span id="favorite-text">Add to Favorites</span>
+                    </button>
+                    
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-secondary touch-target" onclick="window.print()">
+                            <i class="fas fa-print"></i> <span class="d-none d-sm-inline">Print</span>
+                        </button>
+                        <button class="btn btn-outline-secondary touch-target" id="share-btn">
+                            <i class="fas fa-share"></i> <span class="d-none d-sm-inline">Share</span>
+                        </button>
+                    </div>
+                    
+                    <div id="recipe-actions" style="display: none;">
+                        <div class="btn-group w-100" role="group">
+                            <a href="#" class="btn btn-warning touch-target" id="edit-recipe-btn">
+                                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Edit</span>
+                            </a>
+                            <button class="btn btn-danger touch-target" id="delete-recipe-btn">
+                                <i class="fas fa-trash"></i> <span class="d-none d-sm-inline">Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe Details -->
+        <div class="row">
+            <!-- Recipe Image and Info -->
+            <div class="col-12 col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="" alt="" class="card-img-top rounded img-responsive" 
+                         id="recipe-image" style="height: 300px; object-fit: cover;">
+                    
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4" id="prep-time-container" style="display: none;">
+                                <div class="border-end">
+                                    <i class="fas fa-clock text-primary"></i>
+                                    <div class="fw-bold" id="prep-time"></div>
+                                    <small class="text-muted">Prep Time</small>
+                                </div>
+                            </div>
+                            <div class="col-4" id="cook-time-container" style="display: none;">
+                                <div class="border-end">
+                                    <i class="fas fa-fire text-danger"></i>
+                                    <div class="fw-bold" id="cook-time"></div>
+                                    <small class="text-muted">Cook Time</small>
+                                </div>
+                            </div>
+                            <div class="col-4" id="servings-container" style="display: none;">
+                                <div>
+                                    <i class="fas fa-users text-success"></i>
+                                    <div class="fw-bold" id="servings"></div>
+                                    <small class="text-muted">Servings</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Author Info -->
+                <div class="card border-0 shadow-sm mt-3" id="author-info">
+                    <div class="card-body">
+                        <h6 class="card-title">Recipe by</h6>
+                        <div class="d-flex align-items-center">
+                            <img src="" alt="" class="rounded-circle me-3" 
+                                 id="author-avatar" width="50" height="50">
+                            <div>
+                                <h6 class="mb-0" id="author-name"></h6>
+                                <small class="text-muted" id="author-recipe-count"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ingredients and Instructions -->
+            <div class="col-12 col-lg-6">
+                <!-- Ingredients -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Ingredients</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="ingredients-list"></div>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Instructions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="instructions-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">Reviews & Ratings</h3>
+                
+                <!-- Add Review Form (for authenticated users) -->
+                <div id="add-review-form" class="card border-0 shadow-sm mb-4" style="display: none;">
+                    <div class="card-body">
+                        <h5 class="card-title">Write a Review</h5>
+                        <form id="review-form">
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <div class="rating-input" id="rating-input">
+                                    <i class="fas fa-star" data-rating="1"></i>
+                                    <i class="fas fa-star" data-rating="2"></i>
+                                    <i class="fas fa-star" data-rating="3"></i>
+                                    <i class="fas fa-star" data-rating="4"></i>
+                                    <i class="fas fa-star" data-rating="5"></i>
+                                </div>
+                                <input type="hidden" id="rating-value" value="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="review-comment" class="form-label">Comment (optional)</label>
+                                <textarea class="form-control" id="review-comment" rows="3" 
+                                         maxlength="500" placeholder="Share your thoughts about this recipe..."></textarea>
+                                <div class="form-text">Maximum 500 characters</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-star me-2"></i>Submit Review
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Reviews List -->
+                <div id="reviews-container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden">Loading reviews...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-container" class="text-center py-5" style="display: none;">
+        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+        <h4 class="text-muted">Recipe Not Found</h4>
+        <p class="text-muted">The recipe you're looking for doesn't exist or has been removed.</p>
+        <a href="{{ url_for('recipes_page') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Recipes
+        </a>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share Recipe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Recipe URL</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="share-url" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copy-url-btn">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-primary" id="share-facebook">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </a>
+                    <a href="#" class="btn btn-info" id="share-twitter">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </a>
+                    <a href="#" class="btn btn-success" id="share-whatsapp">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.rating-input i {
+    color: #ddd;
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-right: 0.25rem;
+}
+
+.rating-input i:hover,
+.rating-input i.active {
+    color: #ffc107;
+}
+
+@media print {
+    .btn, .card-header, #reviews-container, nav, #recipe-actions {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Get recipe ID from URL
+const recipeId = {{ recipe_id }};
+</script>
+<script src="{{ url_for('static', filename='js/recipe-detail.js') }}"></script>
+{% endblock %}

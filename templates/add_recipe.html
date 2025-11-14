@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Add Recipe - TastyShare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 fw-bold text-center mb-3">
+                <i class="fas fa-plus-circle me-2 text-primary"></i>Add New Recipe
+            </h1>
+            <p class="lead text-center text-muted">
+                Share your culinary creation with the TastyShare community
+            </p>
+        </div>
+    </div>
+
+    <!-- Add Recipe Form -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-utensils me-2"></i>Recipe Details
+                    </h4>
+                </div>
+                <div class="card-body p-3 p-md-4">
+                    <form id="add-recipe-form" enctype="multipart/form-data">
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Basic Information
+                                </h5>
+                            </div>
+                            
+                            <!-- Recipe Title -->
+                            <div class="col-12 col-md-8 mb-3">
+                                <label for="title" class="form-label">Recipe Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required 
+                                       placeholder="Enter a catchy recipe title...">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Servings -->
+                            <div class="col-12 col-md-4 mb-3">
+                                <label for="servings" class="form-label">Servings <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="servings" name="servings" min="1" max="50" required 
+                                       placeholder="4">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="col-12 mb-3">
+                                <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required 
+                                          placeholder="Describe your recipe in a few sentences..."></textarea>
+                                <div class="form-text">What makes this recipe special? Tell us about the flavors, texture, or inspiration.</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- Categories and Tags -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-tags me-2"></i>Categories & Tags
+                                </h5>
+                            </div>
+                            
+                            <!-- Category -->
+                            <div class="col-12 col-sm-6 col-md-3 mb-3">
+                                <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="dessert">Dessert</option>
+                                    <option value="snack">Snack</option>
+                                    <option value="appetizer">Appetizer</option>
+                                    <option value="beverage">Beverage</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Cuisine Type -->
+                            <div class="col-12 col-sm-6 col-md-3 mb-3">
+                                <label for="cuisine-type" class="form-label">Cuisine Type</label>
+                                <select class="form-select" id="cuisine-type" name="cuisine_type">
+                                    <option value="">Select Cuisine</option>
+                                    <option value="american">American</option>
+                                    <option value="italian">Italian</option>
+                                    <option value="chinese">Chinese</option>
+                                    <option value="indian">Indian</option>
+                                    <option value="mexican">Mexican</option>
+                                    <option value="french">French</option>
+                                    <option value="thai">Thai</option>
+                                    <option value="japanese">Japanese</option>
+                                    <option value="mediterranean">Mediterranean</option>
+                                    <option value="korean">Korean</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Dietary Preference -->
+                            <div class="col-12 col-sm-6 col-md-3 mb-3">
+                                <label for="dietary-preference" class="form-label">Dietary Preference</label>
+                                <select class="form-select" id="dietary-preference" name="dietary_preference">
+                                    <option value="">Select Diet</option>
+                                    <option value="vegetarian">Vegetarian</option>
+                                    <option value="vegan">Vegan</option>
+                                    <option value="non-vegetarian">Non-Vegetarian</option>
+                                    <option value="gluten-free">Gluten-Free</option>
+                                    <option value="keto">Keto</option>
+                                    <option value="low-carb">Low Carb</option>
+                                    <option value="dairy-free">Dairy-Free</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Difficulty Level -->
+                            <div class="col-12 col-sm-6 col-md-3 mb-3">
+                                <label for="difficulty-level" class="form-label">Difficulty Level <span class="text-danger">*</span></label>
+                                <select class="form-select" id="difficulty-level" name="difficulty_level" required>
+                                    <option value="">Select Level</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- Timing -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-clock me-2"></i>Timing
+                                </h5>
+                            </div>
+                            
+                            <!-- Prep Time -->
+                            <div class="col-12 col-md-4 mb-3">
+                                <label for="prep-time" class="form-label">Prep Time (minutes) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="prep-time" name="prep_time" min="0" max="600" required 
+                                       placeholder="15">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Cook Time -->
+                            <div class="col-12 col-md-4 mb-3">
+                                <label for="cook-time" class="form-label">Cook Time (minutes) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="cook-time" name="cook_time" min="0" max="600" required 
+                                       placeholder="30">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <!-- Total Time (Auto-calculated) -->
+                            <div class="col-12 col-md-4 mb-3">
+                                <label for="total-time" class="form-label">Total Time (minutes)</label>
+                                <input type="number" class="form-control" id="total-time" name="total_time" readonly 
+                                       placeholder="Auto-calculated">
+                                <div class="form-text">Automatically calculated from prep + cook time</div>
+                            </div>
+                        </div>
+
+                        <!-- Ingredients -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-list me-2"></i>Ingredients <span class="text-danger">*</span>
+                                </h5>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div id="ingredients-container">
+                                    <div class="ingredient-item mb-2">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control ingredient-input" 
+                                                   placeholder="e.g., 2 cups all-purpose flour" required>
+                                            <button class="btn btn-outline-danger remove-ingredient" type="button">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-ingredient">
+                                    <i class="fas fa-plus me-2"></i>Add Ingredient
+                                </button>
+                                <div class="form-text mt-2">Include quantity, unit, and ingredient name (e.g., "2 cups flour", "1 tsp salt")</div>
+                                <div class="invalid-feedback" id="ingredients-error"></div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-clipboard-list me-2"></i>Instructions <span class="text-danger">*</span>
+                                </h5>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div id="instructions-container">
+                                    <div class="instruction-item mb-2">
+                                        <div class="input-group">
+                                            <span class="input-group-text step-number">1</span>
+                                            <textarea class="form-control instruction-input" rows="2" 
+                                                      placeholder="Describe this step in detail..." required></textarea>
+                                            <button class="btn btn-outline-danger remove-instruction" type="button">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-instruction">
+                                    <i class="fas fa-plus me-2"></i>Add Step
+                                </button>
+                                <div class="form-text mt-2">Break down the cooking process into clear, step-by-step instructions</div>
+                                <div class="invalid-feedback" id="instructions-error"></div>
+                            </div>
+                        </div>
+
+                        <!-- Media Upload -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-camera me-2"></i>Media
+                                </h5>
+                            </div>
+                            
+                            <!-- Recipe Image -->
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="recipe-image" class="form-label">Recipe Image</label>
+                                <input type="file" class="form-control" id="recipe-image" name="recipe_image" 
+                                       accept="image/*">
+                                <div class="form-text">Upload a photo of your finished dish (JPG, PNG, GIF - Max 5MB)</div>
+                                <div class="invalid-feedback"></div>
+                                
+                                <!-- Image Preview -->
+                                <div id="image-preview" class="mt-3" style="display: none;">
+                                    <img id="preview-img" src="" alt="Recipe Preview" class="img-thumbnail img-responsive" style="max-width: 200px;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2 touch-target" id="remove-image">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Video URL -->
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="video-url" class="form-label">Video URL (Optional)</label>
+                                <input type="url" class="form-control" id="video-url" name="video_url" 
+                                       placeholder="https://youtube.com/watch?v=...">
+                                <div class="form-text">Link to a cooking video (YouTube, Vimeo, etc.)</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-hashtag me-2"></i>Tags (Optional)
+                                </h5>
+                            </div>
+                            
+                            <div class="col-12">
+                                <input type="text" class="form-control" id="tags" name="tags" 
+                                       placeholder="e.g., quick, healthy, comfort-food, weeknight">
+                                <div class="form-text">Add keywords separated by commas to help others find your recipe</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                                    <div class="text-center text-sm-start">
+                                        <span class="text-danger">*</span> <small class="text-muted">Required fields</small>
+                                    </div>
+                                    <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto">
+                                        <a href="{{ url_for('recipes_page') }}" class="btn btn-outline-secondary touch-target">
+                                            <i class="fas fa-times me-2"></i>Cancel
+                                        </a>
+                                        <button type="button" class="btn btn-outline-primary touch-target" id="save-draft">
+                                            <i class="fas fa-save me-2"></i>Save as Draft
+                                        </button>
+                                        <button type="submit" class="btn btn-primary touch-target">
+                                            <i class="fas fa-paper-plane me-2"></i>Publish Recipe
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="recipe-loading-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-body text-center p-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0">Publishing your recipe...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/add_recipe.js') }}"></script>
+{% endblock %}
