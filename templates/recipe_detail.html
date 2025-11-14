@@ -257,8 +257,8 @@
 
 {% block extra_js %}
 <script>
-// Get recipe ID from URL
-const recipeId = parseInt(window.location.pathname.split('/')[2]);
+// Get recipe ID from template variable
+const recipeId = {{ recipe_id }};
 </script>
 <script src="{{ url_for('static', filename='js/recipe-detail.js') }}"></script>
 {% endblock %}

@@ -40,6 +40,8 @@ class Recipe(db.Model):
         """Calculate average rating for this recipe"""
         if not self.reviews:
             return 0
+        # Use string-based table name to avoid circular import
+        from models.review import Review
         return db.session.query(func.avg(Review.rating)).filter(Review.recipe_id == self.id).scalar() or 0
     
     def get_rating_count(self):
