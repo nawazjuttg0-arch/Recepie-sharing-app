@@ -74,7 +74,7 @@ For your review and testing, please use these accounts:
 - Password: admin123
 
 **Test User Account:**
-- Email: user@tastyshare.com  
+- Email: muhammadnawaz@gmail.com 
 - Password: user123
 
 ## Moving Forward
